@@ -1,3 +1,10 @@
 [user]
 	name = kailubyte
 	email = 162659603+kailubyte@users.noreply.github.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIXY7xTKGg9D9niWYntNtYcNiX0cbOxt9Ma+VPyzOdAI
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[commit]
+	gpgsign = true
