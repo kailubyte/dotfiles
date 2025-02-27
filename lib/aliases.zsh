@@ -29,12 +29,11 @@ alias q="~ && clear"
 [ -d ~/Projects ]             && alias pj='cd ~/Projects'
 [ -d ~/Projects/Forks ]       && alias pjf='cd ~/Projects/Forks'
 [ -d ~/Projects/Job ]         && alias pjj='cd ~/Projects/Job'
-[ -d ~/Projects/Playground ]  && alias pjl='cd ~/Projects/Playground'
+[ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
 
 # Commands Shortcuts
 alias e="$EDITOR"
-alias -- +x='chmod +x'
 alias x+='chmod +x'
 
 # Open aliases
@@ -42,14 +41,14 @@ alias open='open_command'
 alias o='open'
 alias oo='open .'
 alias finder='open .'
-alias term='open -a iterm.app'
+alias term='open -a ghostty.app'
 
 # Run scripts
 alias update="source $DOTFILES/scripts/update"
 alias bootstap="source $DOTFILES/scripts/bootstrap"
 
 # Quick jump to dotfiles
-alias dotfiles="nvim $DOTFILES"
+alias dotfiles="vsc $DOTFILES"
 
 # Quick reload of zsh environment
 alias reload="source $HOME/.zshrc"
