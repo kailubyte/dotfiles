@@ -1,12 +1,13 @@
 #!/bin/bash
 
+
 source "$CONFIG_DIR/colors.sh" # Loads all defined colors
 source "$CONFIG_DIR/icons.sh" # Loads all defined icons
 
 ITEM_DIR="$CONFIG_DIR/items" # Directory where the items are configured
 PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are stored
 
-FONT="SF Pro" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
+FONT="IosevkaTerm NFM" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
 PADDINGS=3 # All paddings use this value (icon, label, background)
 
 # Setting up and starting the helper process
@@ -73,6 +74,9 @@ source "$ITEM_DIR/spaces.sh"
 
 # Right
 
+source "$ITEM_DIR/clock.sh"
+source "$ITEM_DIR/battery.sh"
+source "$ITEM_DIR/wifi.sh"
 source "$ITEM_DIR/brew.sh"
 source "$ITEM_DIR/github.sh"
 
@@ -81,4 +85,4 @@ sketchybar --hotload on
 # Forcing all item scripts to run (never do this outside of sketchybarrc)
 sketchybar --update
 
-echo "sketchybar configuation loaded.."
+echo "sketchybar configuration loaded.."

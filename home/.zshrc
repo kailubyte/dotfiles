@@ -201,3 +201,11 @@ export PATH=$PATH:/Users/readerr/.spicetify
 # ------------------------------------------------------------------------------
 
 eval "$(starship init zsh)"
+
+# ------------------------------------------------------------------------------
+# Auto Complete
+# ------------------------------------------------------------------------------
+
+bindkey '^I'   complete-word       # tab          | complete
+bindkey '^[[Z' autosuggest-accept  # shift + tab  | autosuggest
+
