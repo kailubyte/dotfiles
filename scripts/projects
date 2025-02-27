@@ -7,3 +7,5 @@ fi
 
 mkdir -p ~/Projects/Forks
 mkdir -p ~/Projects/Playground
+mkdir -p ~/Projects/Repos
+mkdir -p ~/Projects/Mine

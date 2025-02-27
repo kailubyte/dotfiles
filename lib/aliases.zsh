@@ -28,7 +28,7 @@ alias q="~ && clear"
 [ -d ~/Desktop ]              && alias dt='cd ~/Desktop'
 [ -d ~/Projects ]             && alias pj='cd ~/Projects'
 [ -d ~/Projects/Forks ]       && alias pjf='cd ~/Projects/Forks'
-[ -d ~/Projects/Job ]         && alias pjj='cd ~/Projects/Job'
+[ -d ~/Projects/Mine ]         && alias pjm='cd ~/Projects/Mine'
 [ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
 
@@ -48,7 +48,7 @@ alias update="source $DOTFILES/scripts/update"
 alias bootstap="source $DOTFILES/scripts/bootstrap"
 
 # Quick jump to dotfiles
-alias dotfiles="vsc $DOTFILES"
+alias dotfiles="cd $DOTFILES && ls -lah"
 
 # Quick reload of zsh environment
 alias reload="source $HOME/.zshrc"

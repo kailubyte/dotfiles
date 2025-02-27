@@ -33,12 +33,11 @@ default-root-container-orientation = 'auto'
 # See https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
-on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodness#disable-hide-app
-automatically-unhide-macos-hidden-apps = false
+automatically-unhide-macos-hidden-apps = true
 
 # [[on-window-detected]]
 # if.app-id = 'com.apple.systempreferences'
@@ -139,7 +138,7 @@ outer.right =      10
 # end tell'
 # '''
 
-alt-ctrl-shift-f = 'fullscreen'
+alt-cmd-f = 'fullscreen'
 alt-ctrl-f = 'layout floating tiling'
 
 alt-shift-left = 'join-with left'
@@ -153,19 +152,27 @@ alt-comma = 'layout accordion horizontal vertical'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 alt-h = 'focus left'
+alt-left = 'focus left'
 alt-j = 'focus down'
+alt-down = 'focus down'
 alt-k = 'focus up'
+alt-up = 'focus up'
 alt-l = 'focus right'
+alt-right = 'focus right'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move
-alt-shift-h = 'move left'
-alt-shift-j = 'move down'
-alt-shift-k = 'move up'
-alt-shift-l = 'move right'
+alt-cmd-h = 'move left'
+alt-cmd-left = 'move left'
+alt-cmd-j = 'move down'
+alt-cmd-down = 'move down'
+alt-cmd-k = 'move up'
+alt-cmd-up = 'move up'
+alt-cmd-l = 'move right'
+alt-cmd-right = 'move right'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#resize
-alt-shift-minus = 'resize smart -50'
-alt-shift-equal = 'resize smart +50'
+alt-cmd-minus = 'resize smart -50'
+alt-cmd-equal = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 alt-1 = 'workspace 1'
@@ -180,20 +187,21 @@ alt-shift-3 = 'move-node-to-workspace 3 --focus-follows-window'
 alt-shift-4 = 'move-node-to-workspace 4 --focus-follows-window'
 
 alt-tab = 'workspace-back-and-forth'
-alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+alt-shift-tab = 'move-node-to-monitor --wrap-around next --focus-follows-window'
+
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-shift-semicolon = 'mode service'
 alt-shift-enter = 'mode apps'
 
-alt-t = 'exec-and-forget open -a /Applications/Telegram.app'
-alt-a = 'exec-and-forget open -a /Applications/Arc.app'
-alt-o = 'exec-and-forget open -a /Applications/Obsidian.app'
-alt-g = 'exec-and-forget open -a /Applications/Ghostty.app'
-alt-s = 'exec-and-forget open -a /Applications/Safari.app'
-alt-q = 'exec-and-forget open -a /System/Applications/QuickTime Player.app'
-alt-w = 'exec-and-forget open -a /Applications/WezTerm.app'
-
+ctrl-g = 'exec-and-forget open -a /Applications/Ghostty.app'
+ctrl-1 = 'exec-and-forget open -a /Applications/Ghostty.app'
+ctrl-f = 'exec-and-forget open -a /Applications/Firefox.app'
+ctrl-3 = 'exec-and-forget open -a /Applications/Firefox.app'
+ctrl-o = 'exec-and-forget open -a /Applications/Obsidian.app'
+ctrl-d = 'exec-and-forget open -a /Applications/Drafts.app'
+ctrl-v = "exec-and-forget open -a /Applications/'Visual Studio Code.app'"
+ctrl-2 = "exec-and-forget open -a /Applications/'Visual Studio Code.app'"
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -202,7 +210,3 @@ esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
-
-[mode.apps.binding]
-alt-w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main']
-

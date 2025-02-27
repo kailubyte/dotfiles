@@ -15,6 +15,9 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
+# Starship Prompt
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
 # Do not override files using `>`, but it's still possible using `>!`
 set -o noclobber
 
@@ -91,9 +94,6 @@ fi
 # Dependencies
 # ------------------------------------------------------------------------------
 
-# Spaceship project directory (for local development)
-SPACESHIP_PROJECT="$HOME/Projects/Repos/spaceship/spaceship-prompt"
-
 # Reset zgen on change
 ZGEN_RESET_ON_CHANGE=(
   ${HOME}/.zshrc
@@ -139,21 +139,11 @@ if ! zgen saved; then
     zgen load $DOTFILES/lib
     zgen load $DOTFILES/custom
 
-    # Load Spaceship prompt from remote
-    if [[ ! -d "$SPACESHIP_PROJECT" ]]; then
-      zgen load spaceship-prompt/spaceship-prompt spaceship
-    fi
-
     # Completions
     zgen load zsh-users/zsh-completions src
 
     # Save all to init script
     zgen save
-fi
-
-# Load Spaceship form local project
-if [[ -d "$SPACESHIP_PROJECT" ]]; then
-  source "$SPACESHIP_PROJECT/spaceship.zsh"
 fi
 
 # ------------------------------------------------------------------------------
@@ -205,3 +195,9 @@ autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
 export PATH=$PATH:/Users/readerr/.spicetify
+
+# ------------------------------------------------------------------------------
+# Starship Prompt
+# ------------------------------------------------------------------------------
+
+eval "$(starship init zsh)"

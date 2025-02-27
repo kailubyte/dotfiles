@@ -1,6 +1,14 @@
 # Homebrew Bundle
 # https://github.com/Homebrew/homebrew-bundle
 
+
+# ------------------------------------------------------------------------------
+# Starship Prompt
+# ------------------------------------------------------------------------------
+
+brew "starship"
+
+
 # ------------------------------------------------------------------------------
 # CLI Tools
 # ------------------------------------------------------------------------------
@@ -48,12 +56,10 @@ tap "homebrew/cask-fonts"
 # ------------------------------------------------------------------------------
 
 # Fonts
-cask "font-iosevka"
-cask "font-hack-nerd-font"
+cask "font-iosevka-term-nerd-font"
 
 # Utils
 cask "gpg-suite"
-cask "jordanbaird-ice" #menubar replacement
 cask "pearcleaner" #app remover
 
 # Media
@@ -62,7 +68,7 @@ cask "vlc"
 cask "obs"
 
 # Development
-cask "iterm2"
+cask "ghostty"
 cask "visual-studio-code"
 
 # Desktop applications
@@ -70,12 +76,14 @@ cask "telegram"
 cask "google-chrome"
 cask "firefox"
 cask "slack"
-#cask "steam"
 cask "spotify"
-#cask "notion"
-#cask "discord"
 cask "little-snitch"
 cask "micro-snitch"
+
+# Window and space management
+cask "borders"
+cask "sketchybar"
+
 # ------------------------------------------------------------------------------
 # App Store applications
 # ------------------------------------------------------------------------------
