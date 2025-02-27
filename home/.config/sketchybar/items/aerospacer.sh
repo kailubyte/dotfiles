@@ -14,4 +14,3 @@ for sid in $(aerospace list-workspaces --all); do
         click_script="aerospace workspace $sid" \
         script="/Users/omerxx/dotfiles/sketchybar/plugins/aerospacer.sh $sid"
 done
-

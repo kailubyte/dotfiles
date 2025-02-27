@@ -203,3 +203,5 @@ export PATH="$PATH:/Users/readerror/.local/bin"
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
+
+export PATH=$PATH:/Users/readerr/.spicetify
