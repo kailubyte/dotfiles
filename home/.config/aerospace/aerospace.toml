@@ -72,6 +72,10 @@ run = 'layout floating'
 if.app-name-regex-substring = '1password'
 run = 'layout floating'
 
+[[on-window-detected]]
+if.app-name-regex-substring = 'spotify'
+run = 'layout floating'
+
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 [key-mapping]
@@ -186,6 +190,7 @@ ctrl-o = 'exec-and-forget open -a /Applications/Obsidian.app'
 ctrl-d = 'exec-and-forget open -a /Applications/Drafts.app'
 ctrl-v = "exec-and-forget open -a /Applications/'Visual Studio Code.app'"
 ctrl-2 = "exec-and-forget open -a /Applications/'Visual Studio Code.app'"
+ctrl-s = "exec-and-forget open -a /Applications/Spotify.app"
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
