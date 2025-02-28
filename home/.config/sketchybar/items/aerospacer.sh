@@ -7,10 +7,12 @@ for sid in $(aerospace list-workspaces --all); do
         --set space."$sid" \
         background.color=0x44ffffff \
         background.corner_radius=5 \
-        background.height=20 \
+        background.height=30 \
         background.drawing=off \
-        label.font.size=14.0 \
+        label.font.size=15.0 \
+        label.padding_left=5 \
+        label.padding_right=10 \
         label="$sid" \
         click_script="aerospace workspace $sid" \
-        script="/Users/omerxx/dotfiles/sketchybar/plugins/aerospacer.sh $sid"
+        script="$PLUGIN_DIR/aerospacer.sh $sid"
 done
