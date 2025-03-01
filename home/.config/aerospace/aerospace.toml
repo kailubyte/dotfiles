@@ -130,7 +130,7 @@ outer.right =      10
 # end tell'
 # '''
 
-alt-cmd-f = 'fullscreen'
+cmd-shift-f = 'fullscreen'
 alt-cmd-shift-f = 'layout floating tiling'
 
 alt-shift-left = 'join-with left'
