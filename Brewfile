@@ -81,10 +81,7 @@ cask "little-snitch"
 cask "micro-snitch"
 
 # Window and space management
-
-tap "FelixKratz/formulae"
-cask "borders"
-cask "sketchybar"
+# Using raycast currently
 
 # ------------------------------------------------------------------------------
 # App Store applications
