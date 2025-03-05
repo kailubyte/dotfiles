@@ -4,7 +4,9 @@ font-family = "IosevkaTerm NFM"
 background-blur-radius = 20
 mouse-hide-while-typing = true
 window-decoration = true
-# keybind = global:cmd+/=toggle_quick_terminal
+command=/Users/readerr/scripts/ghostty-tmux.sh
 macos-option-as-alt = true
-# background-opacity = 0.7
-# background-blur-radius = 20 
+
+# some alt key bind stuff to fix alt / meta and tmux
+keybind = alt+left=unbind
+keybind = alt+right=unbind
