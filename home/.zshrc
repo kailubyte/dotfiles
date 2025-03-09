@@ -130,7 +130,6 @@ if ! zgen saved; then
     zgen load chriskempson/base16-shell
     zgen load djui/alias-tips
     zgen load agkozak/zsh-z
-    zgen load marzocchi/zsh-notify
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions

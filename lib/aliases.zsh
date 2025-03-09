@@ -31,6 +31,7 @@ alias q="~ && clear"
 [ -d ~/Projects/Mine ]         && alias pjm='cd ~/Projects/Mine'
 [ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
+[ -d ~/Projects/Containers ]  && alias pjc='cd ~/Projects/Containers'
 
 # Commands Shortcuts
 alias e="$EDITOR"
