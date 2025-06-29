@@ -28,11 +28,8 @@ alias q="~ && clear"
 [ -d ~/Desktop ]              && alias dt='cd ~/Desktop'
 [ -d ~/Projects ]             && alias pj='cd ~/Projects'
 [ -d ~/Projects/Forks ]       && alias pjf='cd ~/Projects/Forks'
-[ -d ~/Projects/Mine ]         && alias pjm='cd ~/Projects/Mine'
 [ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
-[ -d ~/Projects/Containers ]  && alias pjc='cd ~/Projects/Containers'
-[ -d ~/Projects/Writing ]  && alias pjw='cd ~/Projects/Writing'
 
 # Commands Shortcuts
 alias e="$EDITOR"
