@@ -14,3 +14,4 @@ keybind = alt+right=unbind
 # title & icon
 macos-titlebar-proxy-icon = hidden
 title = " "
+keybind = shift+enter=text:\n
