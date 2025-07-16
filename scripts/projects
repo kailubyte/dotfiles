@@ -5,7 +5,6 @@ if [ "$(uname)" != "Darwin" ]; then
   exit 0
 fi
 
-mkdir -p ~/Projects/Forks
-mkdir -p ~/Projects/Playground
-mkdir -p ~/Projects/Repos
-mkdir -p ~/Projects/Mine
+mkdir -p ~/projects/forks
+mkdir -p ~/projects/playground
+mkdir -p ~/projects/repos

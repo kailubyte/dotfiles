@@ -74,3 +74,7 @@ if _exists lsd; then
   alias ls='lsd'
   alias lt='lsd --tree'
 fi
+
+alias cat='bat --paging=never'
+
+alias ping='prettyping'

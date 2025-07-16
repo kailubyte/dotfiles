@@ -15,3 +15,6 @@ keybind = alt+right=unbind
 macos-titlebar-proxy-icon = hidden
 title = " "
 keybind = shift+enter=text:\n
+
+# shell integration
+shell-integration-features = sudo, no-cursor

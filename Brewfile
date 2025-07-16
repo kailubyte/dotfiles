@@ -12,6 +12,7 @@ brew "starship"
 # ------------------------------------------------------------------------------
 # CLI Tools
 # ------------------------------------------------------------------------------
+cask "ghostty"
 brew "git"
 brew "zsh"
 brew "zsh-completions"
@@ -28,10 +29,8 @@ brew "fzf"
 brew "wget"
 brew "tldr"
 brew "mas"
-brew "gh"
 brew "terminal-notifier"
 brew "wifi-password"
-brew "speedtest-cli"
 brew "bat"
 brew "trash"
 brew "yt-dlp"
@@ -61,20 +60,19 @@ cask "font-iosevka-term-nerd-font"
 # Utils
 cask "gpg-suite"
 cask "pearcleaner" #app remover
+cask "raycast"
 
 # Media
-#cask "transmission"
 cask "vlc"
 cask "obs"
 
 # Development
-cask "ghostty"
 cask "visual-studio-code"
 
 # Desktop applications
-cask "telegram"
 cask "google-chrome"
 cask "firefox"
+cask "zen"
 cask "slack"
 cask "spotify"
 cask "little-snitch"
@@ -87,4 +85,3 @@ cask "micro-snitch"
 # App Store applications
 # ------------------------------------------------------------------------------
 mas "Amphetamine", id: 937984704
-
