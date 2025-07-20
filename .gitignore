@@ -1,0 +1,32 @@
+# Local data and cache directories
+.config/local
+.config/cache
+
+# ZSH runtime files
+.zsh_history
+.config/zsh/.zhistory
+.zsh_sessions/
+.config/zsh/.zsh_sessions/
+.config/zsh/.zcompdump*
+.config/zsh/.zsh_history
+.config/zsh/.zwc
+**/*.zwc
+
+# macOS files
+.DS_Store
+**/.DS_Store
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*~
+
+# .config dirs I want to avoid
+.config/backrest/
+.config/op/

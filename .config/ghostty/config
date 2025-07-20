@@ -1,0 +1,20 @@
+theme = rose-pine
+font-size = 20
+font-family = "IosevkaTerm NFM"
+background-blur-radius = 20
+mouse-hide-while-typing = true
+window-decoration = true
+#command=/Users/readerr/scripts/ghostty-tmux.sh
+macos-option-as-alt = true
+
+# some alt key bind stuff to fix alt / meta and tmux
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+
+# title & icon
+macos-titlebar-proxy-icon = hidden
+title = " "
+keybind = shift+enter=text:\n
+
+# shell integration
+shell-integration-features = sudo, no-cursor

@@ -1,0 +1,21 @@
+# Files that shouldn't be stowed (symlinked)
+.DS_Store
+.git
+.gitignore
+.gitmodules
+.stow-local-ignore
+
+# Documentation
+README.md
+.*\.md$
+LICENSE
+
+# Installation and build files
+install/
+scripts/
+Brewfile
+
+# Temporary files
+.*\.tmp$
+.*~$
+.cache/
