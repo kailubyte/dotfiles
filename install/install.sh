@@ -150,7 +150,7 @@ clone_dotfiles() {
 
 backup_existing_configs() {
     local backup_dir="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
-    local files_to_backup=(".zshenv" ".zshrc" ".gitconfig")
+    local files_to_backup=(".zshenv" ".zshrc")
     local backed_up=false
     
     for file in "${files_to_backup[@]}"; do
