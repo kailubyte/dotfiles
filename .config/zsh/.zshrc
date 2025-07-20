@@ -97,3 +97,4 @@ safe_source "$ZDOTDIR/plugins/zsh-you-should-use/you-should-use.plugin.zsh"
 safe_source "$ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # zprofexport PATH="/opt/homebrew/opt/trash-cli/bin:$PATH"
+
