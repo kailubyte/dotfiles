@@ -43,7 +43,7 @@ brew "docker"            # Docker CLI
 # Media & Download Tools
 # ------------------------------------------------------------------------------
 brew "yt-dlp"            # Video downloader
-brew "gallery-dl"       # Gallery downloader
+brew "gallery-dl"        # Gallery downloader
 brew "ffmpeg"            # Media processing
 brew "aria2"             # Download manager
 

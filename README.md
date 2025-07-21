@@ -175,25 +175,18 @@ cheat command_name      # Get cheatsheet from cheat.sh
 screenres              # Get screen resolution (Linux)
 ```
 
-### Safe File Deletion (trash-cli)
+### Safe File Deletion
 ```bash
 rm file.txt             # Safely move to trash (not permanent deletion)
-trash file.txt          # Same as rm - move to trash
-trash-ls                # List files in trash
-trash-restore           # Interactive restore from trash
-trash-empty             # Empty all trash
-trash-empty 30          # Empty files older than 30 days
-trash-rm "*.tmp"        # Permanently remove specific files from trash
 
 # Alternative rm commands for permanent deletion
 rmi file.txt            # Interactive rm (asks for confirmation)
 rmf file.txt            # Force rm (permanent deletion, no confirmation)
-
-# Helper functions
-trash-status            # Show trash overview and recent items
-trash-size              # Show trash disk usage
-trash-clean 7           # Clean files older than 7 days (default)
 ```
+
+**Platform-specific behavior:**
+- **macOS**: Uses AppleScript to move files to macOS Trash
+- **Linux**: Uses interactive `rm -i` for safety
 
 ## FZF Integration
 
@@ -334,6 +327,7 @@ SSH functionality includes:
 
 ### Development Tools
 - **Neovim**: Modern text editor with full IDE features
+- **Visual Studio Code**: Modern code editor with extensions
 - **Git**: Enhanced configuration with useful aliases
 - **FZF**: Fuzzy finder integration throughout shell
 
@@ -388,8 +382,8 @@ cd ~/.dotfiles
 ### What the installer does:
 
 1. **Installs dependencies**
-   - macOS: Installs Homebrew, then packages from Brewfile (including trash-cli)
-   - Linux: Installs packages via system package manager (including trash-cli)
+   - macOS: Installs Homebrew, then packages from Brewfile
+   - Linux: Installs packages via system package manager
 
 2. **Manages dotfiles**
    - Backs up existing configurations
@@ -398,7 +392,6 @@ cd ~/.dotfiles
 3. **Sets up environment**
    - Installs fonts (IosevkaTerm NFM)
    - Configures ZSH as default shell
-   - Links trash-cli binaries (macOS may require `brew link --force trash-cli`)
    - Sources all configurations
 
 ### Manual Installation
@@ -583,7 +576,7 @@ declare -A FONTS=(
 - Bat - Enhanced cat
 - LSD - Enhanced ls
 - FD - Enhanced find
-- Trash-CLI (`trash-cli`) - Safe file deletion with restore capability
+- Native trash support (macOS Finder integration, Linux interactive rm)
 
 **Language Tools (auto-detected):**
 - Node.js - For Node project detection

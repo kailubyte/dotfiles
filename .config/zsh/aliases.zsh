@@ -61,7 +61,7 @@ case "$(uname -s)" in
         alias myip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
         ;;
     Linux*)
-        alias myip='ip route get 1.1.1.1 | grep -oP "src \K\S+"'
+        alias myip='ip route get 1.1.1.1 | awk "/src/ {print \$7}"'
         ;;
 esac
 
@@ -91,7 +91,7 @@ alias gp='git push'
 alias gpo='git push origin'
 alias gtd='git tag --delete'
 alias gtdr='git tag --delete origin'
-alias gr='git branch -r'
+alias grb='git branch -r'
 alias gplo='git pull origin'
 alias gb='git branch '
 alias gc='git commit'

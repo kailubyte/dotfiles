@@ -96,5 +96,6 @@ safe_source "$ZDOTDIR/plugins/zsh-you-should-use/you-should-use.plugin.zsh"
 # Syntax highlighting - Should be at the end of the file
 safe_source "$ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-# zprofexport PATH="/opt/homebrew/opt/trash-cli/bin:$PATH"
+# zprof
+export PATH="/opt/homebrew/opt/trash-cli/bin:$PATH"
 

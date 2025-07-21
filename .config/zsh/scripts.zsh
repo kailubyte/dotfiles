@@ -89,7 +89,11 @@ cheat() {
 trash-clean() {
     local days=${1:-7}
     echo "Emptying trash older than $days days..."
-    trash-empty "$days"
+    if command -v trash-empty >/dev/null 2>&1; then
+        trash-empty "$days"
+    else
+        echo "trash-empty command not found"
+    fi
 }
 
 # Show trash size
@@ -107,6 +111,10 @@ trash-status() {
     trash-size
     echo ""
     echo "Recent items:"
-    trash-ls | head -5
+    if command -v trash-list >/dev/null 2>&1; then
+        trash-list | head -5
+    else
+        echo "trash-list command not found"
+    fi
 }
 
