@@ -7,6 +7,6 @@
 [gpg]
 	format = ssh
 [gpg "ssh"]
-	program = /opt/homebrew/bin/ssh-keygen
+	program = ssh-keygen
 [commit]
 	gpgsign = true
