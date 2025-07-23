@@ -58,4 +58,8 @@ fi
 # Disable Homebrew analytics on macOS
 if [[ "$(uname -s)" == "Darwin" ]]; then
     export HOMEBREW_NO_ANALYTICS=1
+    # Add Homebrew to PATH if it exists
+    if [[ -d "/opt/homebrew/bin" ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    fi
 fi
