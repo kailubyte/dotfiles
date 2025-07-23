@@ -1,7 +1,6 @@
 # Files that shouldn't be stowed (symlinked)
 .DS_Store
 .git
-.gitignore
 .gitmodules
 .stow-local-ignore
 
