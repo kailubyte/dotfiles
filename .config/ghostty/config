@@ -6,6 +6,7 @@ mouse-hide-while-typing = true
 window-decoration = true
 #command=/Users/readerr/scripts/ghostty-tmux.sh
 macos-option-as-alt = true
+split-divider-color=#FFFFFF
 
 # some alt key bind stuff to fix alt / meta and tmux
 keybind = alt+left=unbind
