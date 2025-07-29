@@ -1,0 +1,22 @@
+# Ghostty Terminal Configuration - Linux
+
+# Theme and appearance
+theme = rose-pine
+font-size = 20
+font-family = "Iosevka Nerd Font"
+mouse-hide-while-typing = true
+window-decoration = true
+split-divider-color = #FFFFFF
+
+# Working directory (will be replaced during install)
+working-directory = HOME_PLACEHOLDER
+
+# Cross-platform keybinds
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+
+# Title
+title = " "
+
+# Shell integration
+shell-integration-features = sudo

@@ -1,0 +1,76 @@
+{
+  "config_version": "2.8.0",
+  "archinstall-language": "English",
+  "keyboard-layout": "us",
+  "mirror-region": {
+    "United States": "https://geo.mirror.pkgbuild.com/$repo/os/$arch"
+  },
+  "sys-language": "en_US",
+  "sys-encoding": "UTF-8",
+  "harddrives": [
+    "/dev/nvme0n1"
+  ],
+  "disk_layouts": {
+    "/dev/nvme0n1": {
+      "wipe": true,
+      "partitions": [
+        {
+          "type": "primary",
+          "start": "1MiB",
+          "size": "1GiB",
+          "mountpoint": "/boot",
+          "filesystem": {
+            "format": "fat32"
+          },
+          "flags": ["boot"]
+        },
+        {
+          "type": "primary", 
+          "start": "1025MiB",
+          "size": "100%",
+          "mountpoint": "/",
+          "filesystem": {
+            "format": "btrfs",
+            "mount_options": ["compress=zstd", "ssd", "discard=async", "space_cache=v2"],
+            "subvolumes": {
+              "@": "/",
+              "@home": "/home",
+              "@log": "/var/log",
+              "@pkg": "/var/cache/pacman/pkg"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "bootloader": "grub-install",
+  "hostname": "sys-forge",
+  "!users": [
+    {
+      "username": "readerr",
+      "sudo": true
+    }
+  ],
+  "profile": "minimal",
+  "audio": "pipewire",
+  "kernels": ["linux"],
+  "packages": [
+    "git",
+    "base-devel", 
+    "vim",
+    "wget",
+    "htop",
+    "man-db",
+    "man-pages",
+    "openssh",
+    "bash-completion"
+  ],
+  "services": ["NetworkManager"],
+  "network": {
+    "type": "nm"
+  },
+  "timezone": "America/Chicago",
+  "ntp": true,
+  "additional-repositories": [],
+  "!encryption-password": null
+}

@@ -1,0 +1,25 @@
+# Ghostty Terminal Configuration - macOS
+
+# Theme and appearance
+theme = rose-pine
+font-size = 20
+font-family = "IosevkaTerm NFM"
+mouse-hide-while-typing = true
+window-decoration = true
+split-divider-color = #FFFFFF
+
+# Cross-platform keybinds
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+keybind = shift+enter=text:\n
+
+# Title
+title = " "
+
+# Shell integration
+shell-integration-features = sudo, no-cursor
+
+# macOS specific settings (ignored on Linux)
+macos-option-as-alt = true
+macos-titlebar-proxy-icon = hidden
+background-blur-radius = 20

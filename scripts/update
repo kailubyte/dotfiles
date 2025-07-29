@@ -1,0 +1,374 @@
+#!/usr/bin/env bash
+
+# Dotfiles update script
+# Updates dotfiles repository, packages, and checks for system updates
+
+set -e
+
+# Set dotfiles directory
+DOTFILES="$HOME/.dotfiles"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+step() {
+    echo -e "${BLUE}[STEP]${NC} $1"
+}
+
+check_os() {
+    case "$(uname -s)" in
+        Darwin*)
+            echo "macos"
+            ;;
+        Linux*)
+            echo "linux"
+            ;;
+        *)
+            error "Unsupported operating system: $(uname -s)"
+            exit 1
+            ;;
+    esac
+}
+
+check_system_updates_macos() {
+    step "Checking for macOS system updates..."
+    
+    # Check for available updates (disable set -e temporarily)
+    local updates
+    set +e
+    # Use gtimeout if available, fallback to timeout, or no timeout
+    if command -v gtimeout >/dev/null 2>&1; then
+        updates=$(gtimeout 30 softwareupdate -l 2>&1)
+    elif command -v timeout >/dev/null 2>&1; then
+        updates=$(timeout 30 softwareupdate -l 2>&1)
+    else
+        updates=$(softwareupdate -l 2>&1)
+    fi
+    local exit_code=$?
+    set -e
+    
+    if [[ $exit_code -eq 124 ]]; then
+        warn "softwareupdate command timed out after 30 seconds"
+        return 0
+    elif [[ $exit_code -ne 0 ]]; then
+        warn "Unable to check for macOS updates (command failed with exit code $exit_code)"
+        return 0
+    fi
+    
+    # Check for "No new software available" which indicates system is up to date
+    if echo "$updates" | grep -q "No new software available"; then
+        info "macOS is up to date"
+    else
+        # Look for actual update entries (lines starting with * and containing recommendations)
+        if echo "$updates" | grep -q -E "^\s*\*.*"; then
+            warn "macOS system updates are available:"
+            echo "$updates" | grep -E "^\s*\*.*"
+            echo ""
+            warn "Run 'sudo softwareupdate -i -a' to install updates"
+            warn "Note: System updates may require a restart"
+        else
+            info "macOS is up to date"
+        fi
+    fi
+}
+
+check_system_updates_linux() {
+    step "Checking for Linux system updates..."
+    
+    if command -v apt >/dev/null 2>&1; then
+        # Update package list first
+        sudo apt update >/dev/null 2>&1
+        local upgradable
+        upgradable=$(apt list --upgradable 2>/dev/null | grep -v "WARNING" | wc -l)
+        if [[ $upgradable -gt 1 ]]; then  # -gt 1 because header line counts
+            warn "$((upgradable - 1)) packages can be upgraded"
+            warn "Run 'sudo apt upgrade' to install updates"
+        else
+            info "All packages are up to date"
+        fi
+        
+        # Check for security updates
+        local security_updates
+        security_updates=$(apt list --upgradable 2>/dev/null | grep -c "security" || true)
+        if [[ $security_updates -gt 0 ]]; then
+            warn "$security_updates security updates available"
+        fi
+        
+    elif command -v dnf >/dev/null 2>&1; then
+        local updates
+        updates=$(dnf check-update --quiet 2>/dev/null | wc -l || true)
+        if [[ $updates -gt 0 ]]; then
+            warn "$updates packages can be upgraded"
+            warn "Run 'sudo dnf update' to install updates"
+        else
+            info "All packages are up to date"
+        fi
+        
+    elif command -v pacman >/dev/null 2>&1; then
+        local updates
+        updates=$(checkupdates 2>/dev/null | wc -l || true)
+        if [[ $updates -gt 0 ]]; then
+            warn "$updates packages can be upgraded"
+            warn "Run 'sudo pacman -Syu' to install updates"
+        else
+            info "All packages are up to date"
+        fi
+        
+    else
+        warn "Unable to check for system updates (no supported package manager)"
+    fi
+}
+
+update_dotfiles_repo() {
+    step "Updating dotfiles repository..."
+    
+    if [[ ! -d "$DOTFILES/.git" ]]; then
+        error "Dotfiles directory is not a git repository: $DOTFILES"
+        exit 1
+    fi
+    
+    cd "$DOTFILES"
+    
+    # Check if there are uncommitted changes
+    if ! git diff-index --quiet HEAD --; then
+        warn "Uncommitted changes detected in dotfiles repository"
+        echo "Uncommitted files:"
+        git status --porcelain
+        echo ""
+        read -p "Continue with update? [y/N] " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Update cancelled"
+            exit 0
+        fi
+    fi
+    
+    # Pull latest changes
+    info "Pulling latest changes from remote..."
+    git pull origin main || {
+        error "Failed to pull latest changes"
+        exit 1
+    }
+    
+    info "Dotfiles repository updated successfully"
+}
+
+backup_and_restow() {
+    step "Re-linking dotfiles with backup..."
+    
+    cd "$DOTFILES"
+    
+    if ! command -v stow >/dev/null 2>&1; then
+        error "GNU Stow is not installed"
+        exit 1
+    fi
+    
+    local backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+    local stow_dir="$DOTFILES"
+    local target_dir="$HOME"
+    
+    info "Checking for conflicting files..."
+    
+    # Find all files that would be stowed (excluding ignored directories)
+    local files_to_stow=()
+    while IFS= read -r -d '' file; do
+        # Skip ignored directories
+        if [[ "$file" == "./install/"* ]] || [[ "$file" == "./scripts/"* ]] || [[ "$file" == "./packages/"* ]]; then
+            continue
+        fi
+        # Remove leading ./ and add to array
+        files_to_stow+=("${file#./}")
+    done < <(find . -type f -print0)
+    
+    # Check each file for conflicts and backup if needed
+    local backed_up_count=0
+    for file in "${files_to_stow[@]}"; do
+        local target_file="$target_dir/$file"
+        
+        # If target file exists and is not a symlink, back it up
+        if [[ -f "$target_file" && ! -L "$target_file" ]]; then
+            if [[ $backed_up_count -eq 0 ]]; then
+                mkdir -p "$backup_dir"
+                info "Created backup directory: $backup_dir"
+            fi
+            
+            # Create parent directory in backup if needed
+            mkdir -p "$backup_dir/$(dirname "$file")"
+            
+            # Move the existing file to backup
+            mv "$target_file" "$backup_dir/$file"
+            info "Backed up: $file"
+            ((backed_up_count++))
+        fi
+    done
+    
+    if [[ $backed_up_count -gt 0 ]]; then
+        info "Backed up $backed_up_count conflicting files to $backup_dir"
+    else
+        info "No conflicting files found"
+    fi
+    
+    # Re-stow to update any new or changed files using new architecture
+    info "Re-stowing dotfiles..."
+    local os_type
+    os_type=$(check_os)
+    
+    if [[ "$os_type" == "macos" ]]; then
+        stow -R -v macos || {
+            error "Failed to re-stow macos dotfiles"
+            exit 1
+        }
+    else
+        stow -R -v linux || {
+            error "Failed to re-stow linux dotfiles"
+            exit 1
+        }
+    fi
+    
+    stow -R -v common || {
+        error "Failed to re-stow common dotfiles"
+        exit 1
+    }
+    
+    info "Dotfiles re-linked successfully"
+}
+
+update_packages_macos() {
+    step "Updating macOS packages..."
+    
+    if ! command -v brew >/dev/null 2>&1; then
+        warn "Homebrew not installed, skipping package updates"
+        return 0
+    fi
+    
+    # Update Homebrew
+    info "Updating Homebrew..."
+    brew update || warn "Failed to update Homebrew"
+    
+    # Upgrade packages
+    info "Upgrading installed packages..."
+    brew upgrade || warn "Some packages failed to upgrade"
+    
+    # Update from packages/macos.txt if it exists
+    if [[ -f "$DOTFILES/packages/macos.txt" ]]; then
+        info "Installing/updating packages from packages/macos.txt..."
+        brew bundle --file="$DOTFILES/packages/macos.txt" || warn "Some packages failed to install"
+    fi
+    
+    # Cleanup
+    info "Cleaning up Homebrew..."
+    brew cleanup || warn "Homebrew cleanup had issues"
+    
+    # Run brew doctor
+    info "Running brew doctor..."
+    if ! brew doctor; then
+        warn "brew doctor found issues (see above)"
+        warn "These may need manual attention"
+    else
+        info "brew doctor: no issues found"
+    fi
+}
+
+update_packages_linux() {
+    step "Updating Linux packages..."
+    
+    if command -v apt >/dev/null 2>&1; then
+        info "Updating packages via apt..."
+        sudo apt update && sudo apt upgrade -y || warn "apt update/upgrade failed"
+        sudo apt autoremove -y || warn "apt autoremove failed"
+        
+    elif command -v dnf >/dev/null 2>&1; then
+        info "Updating packages via dnf..."
+        sudo dnf update -y || warn "dnf update failed"
+        sudo dnf autoremove -y || warn "dnf autoremove failed"
+        
+    elif command -v pacman >/dev/null 2>&1; then
+        info "Updating packages via pacman..."
+        sudo pacman -Syu --noconfirm || warn "pacman update failed"
+        sudo pacman -Rns $(pacman -Qtdq) --noconfirm 2>/dev/null || true  # Remove orphans
+        
+    elif command -v zypper >/dev/null 2>&1; then
+        info "Updating packages via zypper..."
+        sudo zypper update -y || warn "zypper update failed"
+        
+    else
+        warn "No supported package manager found for updates"
+    fi
+}
+
+reload_shell() {
+    step "Reloading shell configuration..."
+    
+    # Source the updated configuration
+    if [[ -f "$HOME/.zshenv" ]]; then
+        source "$HOME/.zshenv"
+    fi
+    
+    if [[ -f "$ZDOTDIR/.zshrc" ]]; then
+        source "$ZDOTDIR/.zshrc"
+        info "Shell configuration reloaded"
+    else
+        warn "Could not reload shell configuration"
+        info "You may need to restart your terminal or run: exec zsh"
+    fi
+}
+
+main() {
+    local os_type
+    os_type=$(check_os)
+    
+    info "Starting dotfiles update for $os_type..."
+    
+    # Check for system updates first
+    case "$os_type" in
+        macos)
+            check_system_updates_macos
+            ;;
+        linux)
+            check_system_updates_linux
+            ;;
+    esac
+    
+    echo ""
+    
+    # Update the dotfiles repository
+    update_dotfiles_repo
+    
+    # Re-link dotfiles
+    backup_and_restow
+    
+    # Update packages based on OS
+    case "$os_type" in
+        macos)
+            update_packages_macos
+            ;;
+        linux)
+            update_packages_linux
+            ;;
+    esac
+    
+    # Reload shell configuration
+    reload_shell
+    
+    echo ""
+    info "Dotfiles update completed successfully!"
+    info "If you see any errors above, they may need manual attention."
+}
+
+main "$@"

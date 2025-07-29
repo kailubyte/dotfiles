@@ -1,0 +1,41 @@
+# Files that shouldn't be stowed (symlinked)
+.DS_Store
+.git
+.gitmodules
+.stow-local-ignore
+
+# Documentation
+README.md
+.*\.md$
+LICENSE
+
+# Installation and build files
+install/
+scripts/
+packages/
+os-configs/
+Brewfile
+
+# Temporary files
+.*\.tmp$
+.*~$
+.cache/
+
+# WHITELIST APPROACH: Only stow specific .config subdirs
+# Block all .config by default, then whitelist specific apps
+.*/.config$
+.*/.config/.*
+
+# Whitelist specific config directories we want to track
+!.*/.config/aerospace$
+!.*/.config/aerospace/.*
+!.*/.config/ghostty$
+!.*/.config/ghostty/.*  
+!.*/.config/git$
+!.*/.config/git/.*
+!.*/.config/nvim$
+!.*/.config/nvim/.*
+!.*/.config/tmux$
+!.*/.config/tmux/.*
+!.*/.config/zsh$
+!.*/.config/zsh/.*

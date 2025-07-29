@@ -1,0 +1,95 @@
+# Local data and cache directories
+.config/local
+.config/cache
+
+# ZSH runtime files
+.zsh_history
+**/.zsh_history
+*/.config/zsh/.zhistory
+**/.config/zsh/.zhistory
+.zsh_sessions/
+*/.config/zsh/.zsh_sessions/
+**/.config/zsh/.zsh_sessions/
+*/.config/zsh/.zcompdump*
+**/.config/zsh/.zcompdump*
+**/.config/zsh/.zsh_history
+*/.config/zsh/.zwc
+**/.config/zsh/.zwc
+**/*.zwc
+
+# macOS files
+.DS_Store
+**/.DS_Store
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*
+
+# Security-sensitive files
+**/id_rsa
+**/id_ed25519
+**/id_*
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*_key
+**/*_secret
+**/secrets.*
+**/token*
+**/password*
+**/.aws/credentials
+**/.ssh/id_*
+**/.ssh/*_rsa*
+**/.ssh/*_ed25519*
+
+# Runtime and cache files
+**/.cache/
+**/cache/
+**/*.cache
+**/.local/share/
+
+# Temporary files
+*.tmp
+*~
+*.swp
+*.swo
+
+# NEW STRUCTURE: OS-specific directories + common
+# OS-specific directories are tracked (no ignore rules needed)
+
+# WHITELIST APPROACH: Only track specific .config subdirs in Git
+# Block all .config by default, then whitelist specific apps
+*//.config/*
+*/.config/*
+
+# Whitelist specific config directories we want to track
+!*//.config/aerospace/
+!*//.config/aerospace/**
+!*/.config/aerospace/
+!*/.config/aerospace/**
+!*//.config/ghostty/
+!*//.config/ghostty/**
+!*/.config/ghostty/
+!*/.config/ghostty/**
+!*//.config/git/
+!*//.config/git/**
+!*/.config/git/
+!*/.config/git/**
+!*//.config/nvim/
+!*//.config/nvim/**
+!*/.config/nvim/
+!*/.config/nvim/**
+!*//.config/tmux/
+!*//.config/tmux/**
+!*/.config/tmux/
+!*/.config/tmux/**
+!*//.config/zsh/
+!*//.config/zsh/**
+!*/.config/zsh/
+!*/.config/zsh/**
+
+macos/.config/zsh/.zsh_history

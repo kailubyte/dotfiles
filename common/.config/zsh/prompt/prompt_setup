@@ -1,0 +1,370 @@
+# Based on:
+
+# Purification
+# by Matthieu Cneude
+# https://github.com/Phantas0s/purification
+# MIT License
+
+# Purity
+# by Kevin Lanni
+# https://github.com/therealklanni/purity
+# MIT License
+
+# Pure
+# by Sindre Sorhus
+# https://github.com/sindresorhus/pure
+# MIT License
+
+# Starship
+# by Soren Bjornstad
+# https://github.com/Starship/starship
+# ISC License
+
+# prompt:
+# %F => color dict
+# %f => reset color
+# %~ => current path
+# %* => time
+# %n => username
+# %m => shortname host
+# %(?..) => prompt conditional - %(condition.true.false)
+
+# Display git status
+# Uses ripgrep (rg) for better performance
+git_prompt_status() {
+  # Only show git status if we're in a git repo
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return
+  fi
+  
+  local INDEX STATUS
+
+  INDEX=$(command git status --porcelain -b 2> /dev/null)
+
+  STATUS=""
+
+  if $(echo "$INDEX" | rg -q '^\?\? '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_UNTRACKED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^A  '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_ADDED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^M  '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_ADDED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^MM '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_ADDED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^ M '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_MODIFIED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^AM '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_MODIFIED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^MM '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_MODIFIED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^ T '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_MODIFIED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^R  '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_RENAMED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^ D '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_DELETED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^D  '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_DELETED$STATUS"
+  elif $(echo "$INDEX" | rg -q '^AD '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_DELETED$STATUS"
+  fi
+
+  if $(command git rev-parse --verify refs/stash >/dev/null 2>&1); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_STASHED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^UU '); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_UNMERGED$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^## [^ ]+ .*ahead'); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_AHEAD$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^## [^ ]+ .*behind'); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_BEHIND$STATUS"
+  fi
+
+  if $(echo "$INDEX" | rg -q '^## [^ ]+ .*diverged'); then
+    STATUS="$ZSH_THEME_GIT_PROMPT_DIVERGED$STATUS"
+  fi
+
+  if [[ ! -z "$STATUS" ]]; then
+    echo " [ $STATUS]"
+  fi
+}
+
+
+prompt_git_branch() {
+    autoload -Uz vcs_info 
+    precmd_vcs_info() { vcs_info }
+    precmd_functions+=( precmd_vcs_info )
+    setopt prompt_subst
+    zstyle ':vcs_info:git:*' formats '%b'
+}
+
+prompt_git_info() {
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        [ ! -z "$vcs_info_msg_0_" ] && echo "$ZSH_THEME_GIT_PROMPT_PREFIX%F{white}$vcs_info_msg_0_%f$ZSH_THEME_GIT_PROMPT_SUFFIX"
+    fi
+}
+
+
+# Context detection functions
+prompt_node_version() {
+    if [[ -f package.json ]] && command -v node >/dev/null 2>&1; then
+        echo " %F{green}node%f $(node -v)"
+    fi
+}
+
+prompt_python_env() {
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        echo " %F{yellow}py%f $(basename $VIRTUAL_ENV)"
+    elif [[ -f requirements.txt || -f pyproject.toml || -f setup.py ]] && command -v python3 >/dev/null 2>&1; then
+        echo " %F{yellow}py%f $(python3 --version | awk '{print $2}')"
+    fi
+}
+
+prompt_go_version() {
+    if [[ -f go.mod ]] && command -v go >/dev/null 2>&1; then
+        echo " %F{cyan}go%f $(go version | awk '{print $3}' | sed 's/go//')"
+    fi
+}
+
+prompt_rust_version() {
+    if [[ -f Cargo.toml ]] && command -v rustc >/dev/null 2>&1; then
+        echo " %F{red}rust%f $(rustc --version | awk '{print $2}')"
+    fi
+}
+
+prompt_package_manager() {
+    # Check for package manager lock files to determine which is being used
+    if [[ -f yarn.lock ]]; then
+        echo " %F{blue}yarn%f"
+    elif [[ -f pnpm-lock.yaml ]]; then
+        echo " %F{yellow}pnpm%f"
+    elif [[ -f package-lock.json ]]; then
+        echo " %F{red}npm%f"
+    elif [[ -f Pipfile.lock ]]; then
+        echo " %F{green}pipenv%f"
+    elif [[ -f poetry.lock ]]; then
+        echo " %F{blue}poetry%f"
+    elif [[ -f Cargo.lock ]]; then
+        echo " %F{orange}cargo%f"
+    fi
+}
+
+prompt_cicd_detection() {
+    # Detect CI/CD configurations
+    if [[ -d .github/workflows ]]; then
+        echo " %F{green}gh-actions%f"
+    elif [[ -f .gitlab-ci.yml ]]; then
+        echo " %F{orange}gitlab-ci%f"
+    elif [[ -f .circleci/config.yml ]]; then
+        echo " %F{green}circleci%f"
+    elif [[ -f .travis.yml ]]; then
+        echo " %F{yellow}travis%f"
+    elif [[ -f azure-pipelines.yml ]]; then
+        echo " %F{blue}azure%f"
+    elif [[ -f Jenkinsfile ]]; then
+        echo " %F{blue}jenkins%f"
+    fi
+}
+
+prompt_git_worktree() {
+    # Check if we're in a git worktree (not the main repository)
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        local git_dir=$(git rev-parse --git-dir 2>/dev/null)
+        if [[ "$git_dir" == *"/.git/worktrees/"* ]]; then
+            local worktree_name=$(basename "$(git rev-parse --show-toplevel)")
+            echo " %F{magenta}worktree%f $worktree_name"
+        fi
+    fi
+}
+
+prompt_aws_profile() {
+    if [[ -n "$AWS_PROFILE" && "$AWS_PROFILE" != "default" ]]; then
+        echo " %F{orange}aws%f $AWS_PROFILE"
+    fi
+}
+
+prompt_terraform_workspace() {
+    if [[ -n $(echo *.tf(N)) ]] && command -v terraform >/dev/null 2>&1; then
+        local workspace=$(terraform workspace show 2>/dev/null)
+        if [[ -n "$workspace" && "$workspace" != "default" ]]; then
+            echo " %F{magenta}tf%f $workspace"
+        fi
+    fi
+}
+
+prompt_docker_context() {
+    if command -v docker >/dev/null 2>&1; then
+        local context=$(docker context show 2>/dev/null)
+        # Only show context if it's not a default/standard Docker Desktop context
+        if [[ -n "$context" && "$context" != "default" && "$context" != "desktop-linux" && "$context" != "desktop-windows" ]]; then
+            echo " %F{blue}docker%f $context"
+        fi
+    fi
+}
+
+# Directory truncation - Fish-style truncation
+prompt_truncate_path() {
+    local path="$1"
+    local max_length=40
+    
+    # Handle home directory replacement first
+    if [[ "$path" == "$HOME"* ]]; then
+        path="${path/#$HOME/~}"
+    fi
+    
+    # For very long paths, always truncate. For shorter ones, check length properly
+    # Split path into components first
+    local parts=("${(@s:/:)path}")
+    
+    # If we have many directories or the path looks long, apply truncation
+    if [[ ${#parts[@]} -gt 4 ]] || [[ "$path" == */*/*/*/*/* ]]; then
+        # Fish-style: Keep first part (~ or /) and last 2 parts full, truncate the rest
+        local result="${parts[1]}"  # ~ or /
+        
+        # Truncate middle directories to first character, keep last 2 full
+        local last_full=2
+        for ((i=2; i<=${#parts[@]}; i++)); do
+            if [[ $i -le $((${#parts[@]} - $last_full)) ]]; then
+                # Truncate to first character
+                result+="/${parts[i]:0:1}"
+            else
+                # Keep full
+                result+="/${parts[i]}"
+            fi
+        done
+        
+        echo "$result"
+    else
+        # Short enough, return as-is
+        echo "$path"
+    fi
+}
+
+prompt_precmd() {
+    # Show execution time for long commands
+    if [ $timer ]; then
+        local now
+        case "$(uname -s)" in
+            Darwin*)
+                now=$(date +%s)
+                ;;
+            Linux*)
+                now=$(($(date +%s%N)/1000000))
+                ;;
+            *)
+                now=$(date +%s)
+                ;;
+        esac
+        
+        local elapsed=$(($now-$timer))
+        local threshold
+        case "$(uname -s)" in
+            Darwin*)
+                threshold=1  # seconds
+                ;;
+            Linux*)
+                threshold=1000  # milliseconds
+                ;;
+            *)
+                threshold=1  # seconds
+                ;;
+        esac
+        
+        if [[ $elapsed -gt $threshold ]]; then
+            printf '%s took %s\n' "$last_command" "$(format_duration $elapsed)"
+        fi
+        unset timer
+    fi
+    
+    # Pass a line before each prompt
+    print -P ''
+}
+
+prompt_preexec() {
+    case "$(uname -s)" in
+        Darwin*)
+            timer=$(date +%s)
+            ;;
+        Linux*)
+            timer=$(($(date +%s%N)/1000000))
+            ;;
+        *)
+            timer=$(date +%s)
+            ;;
+    esac
+    last_command=$1
+}
+
+format_duration() {
+    local elapsed=$1
+    case "$(uname -s)" in
+        Darwin*)
+            # Input is seconds
+            if [[ $elapsed -lt 60 ]]; then
+                echo "${elapsed}s"
+            else
+                echo "$((elapsed/60))m $((elapsed%60))s"
+            fi
+            ;;
+        Linux*)
+            # Input is milliseconds
+            if [[ $elapsed -lt 1000 ]]; then
+                echo "${elapsed}ms"
+            elif [[ $elapsed -lt 60000 ]]; then
+                echo "$((elapsed/1000))s"
+            else
+                echo "$((elapsed/60000))m $((elapsed%60000/1000))s"
+            fi
+            ;;
+        *)
+            # Fallback: seconds
+            if [[ $elapsed -lt 60 ]]; then
+                echo "${elapsed}s"
+            else
+                echo "$((elapsed/60))m $((elapsed%60))s"
+            fi
+            ;;
+    esac
+}
+
+prompt_setup() {
+    # Display git branch
+
+    autoload -Uz add-zsh-hook
+    add-zsh-hook precmd prompt_precmd
+    add-zsh-hook preexec prompt_preexec
+
+    ZSH_THEME_GIT_PROMPT_PREFIX=" %F{red}λ%f:"
+    ZSH_THEME_GIT_PROMPT_DIRTY=""
+    ZSH_THEME_GIT_PROMPT_CLEAN=""
+
+    ZSH_THEME_GIT_PROMPT_ADDED="%F{green}+%f "
+    ZSH_THEME_GIT_PROMPT_MODIFIED="%F{blue}%f "
+    ZSH_THEME_GIT_PROMPT_DELETED="%F{red}x%f "
+    ZSH_THEME_GIT_PROMPT_RENAMED="%F{magenta}➜%f "
+    ZSH_THEME_GIT_PROMPT_UNMERGED="%F{yellow}═%f "
+    ZSH_THEME_GIT_PROMPT_UNTRACKED="%F{white}%f "
+    ZSH_THEME_GIT_PROMPT_STASHED="%B%F{red}%f%b "
+    ZSH_THEME_GIT_PROMPT_BEHIND="%B%F{red}%f%b "
+    ZSH_THEME_GIT_PROMPT_AHEAD="%B%F{green}%f%b "
+
+    prompt_git_branch
+    RPROMPT='$(prompt_git_info) $(git_prompt_status)'
+    PROMPT=$'%F{cyan}%n@%m%f %F{white}$(prompt_truncate_path "%~")%f$(prompt_node_version)$(prompt_python_env)$(prompt_go_version)$(prompt_rust_version)$(prompt_package_manager)$(prompt_cicd_detection)$(prompt_aws_profile)$(prompt_terraform_workspace)$(prompt_docker_context)\n%(?.%B%F{blue}❯%f%b.%B%F{red}❯%f%b) '
+}
+
+prompt_setup
+
