@@ -90,6 +90,10 @@ if [ $(command -v "fzf") ]; then
     source $ZDOTDIR/fzf.zsh
 fi
 
+# git SSH yubikey
+
+export GIT_SSH_COMMAND="/opt/homebrew/bin/ssh"
+
 # zsh-you-should-use - alias tips
 safe_source "$DOTFILES/common/.config/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh"
 
