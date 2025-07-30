@@ -239,3 +239,8 @@ inner.vertical =   5
 #[[on-window-detected]]
 #    if.app-name-regex-substring = 'slack'
 #    run = 'layout floating'
+
+ Floating windows
+[[on-window-detected]]
+    if.app-name-regex-substring = 'finder'
+    run = 'layout floating'
