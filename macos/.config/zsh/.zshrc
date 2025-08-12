@@ -94,6 +94,10 @@ fi
 
 export GIT_SSH_COMMAND="/opt/homebrew/bin/ssh"
 
+# zoxide
+
+eval "$(zoxide init zsh)"
+
 # zsh-you-should-use - alias tips
 safe_source "$DOTFILES/common/.config/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh"
 
