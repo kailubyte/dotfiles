@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Modular font installation script
-# Supports macOS and Linux
+# macOS-only
 
 set -e
 
@@ -36,11 +36,11 @@ error() {
 check_font_installed() {
     local font_check_name="$1"
     case "$(uname -s)" in
-        Darwin*|Linux*)
+        Darwin*)
             fc-list | grep -q "$font_check_name" 2>/dev/null || return 1
             ;;
         *)
-            return 1
+            error "This script only supports macOS"
             ;;
     esac
 }
@@ -65,108 +65,6 @@ install_font_macos() {
     fi
 }
 
-install_font_linux() {
-    local font_name="$1"
-    local download_name="$2"
-    local check_name="$3"
-    
-    info "Installing ${font_name} on Linux..."
-    
-    # Create fonts directory
-    FONT_DIR="$HOME/.local/share/fonts"
-    mkdir -p "$FONT_DIR"
-    
-    # Check if font is already installed
-    if ls "$FONT_DIR"/*"$check_name"*.ttf >/dev/null 2>&1; then
-        info "Font already installed in $FONT_DIR"
-        return 0
-    fi
-    
-    # Download and install font
-    TEMP_DIR=$(mktemp -d)
-    cd "$TEMP_DIR"
-    
-    local download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONTS_VERSION}/${download_name}.zip"
-    
-    info "Downloading ${font_name}..."
-    if command -v curl >/dev/null 2>&1; then
-        curl -L -o "${download_name}.zip" "$download_url"
-    elif command -v wget >/dev/null 2>&1; then
-        wget -O "${download_name}.zip" "$download_url"
-    else
-        error "Neither curl nor wget is available for downloading fonts"
-    fi
-    
-    info "Extracting font files..."
-    unzip -q "${download_name}.zip"
-    
-    # Copy TTF files to fonts directory
-    cp *.ttf "$FONT_DIR/" 2>/dev/null || true
-    
-    info "Font files installed to $FONT_DIR"
-    
-    # Update font cache
-    if command -v fc-cache >/dev/null 2>&1; then
-        info "Updating font cache..."
-        fc-cache -f "$FONT_DIR"
-    else
-        warn "fc-cache not available, font cache not updated"
-    fi
-    
-    # Cleanup
-    cd - >/dev/null
-    rm -rf "$TEMP_DIR"
-}
-
-install_font_linux_package_manager() {
-    local font_name="$1"
-    local check_name="$2"
-    
-    # Try to install via package manager first (limited support)
-    # Note: Package manager font names vary significantly across distros
-    # This is best-effort only, manual installation is more reliable
-    
-    if [[ "$font_name" == "IosevkaTerm NFM" ]]; then
-        if command -v apt >/dev/null 2>&1; then
-            # Ubuntu/Debian
-            if apt list --installed 2>/dev/null | grep -q fonts-iosevka-term; then
-                info "Font already installed via apt"
-                return 0
-            fi
-            info "Trying to install via apt..."
-            if sudo apt install -y fonts-iosevka-term-nerd-font 2>/dev/null; then
-                info "Font installed via apt"
-                return 0
-            fi
-        elif command -v dnf >/dev/null 2>&1; then
-            # Fedora
-            if dnf list installed 2>/dev/null | grep -q iosevka-term; then
-                info "Font already installed via dnf"
-                return 0
-            fi
-            info "Trying to install via dnf..."
-            if sudo dnf install -y iosevka-term-fonts 2>/dev/null; then
-                info "Font installed via dnf"
-                return 0
-            fi
-        elif command -v pacman >/dev/null 2>&1; then
-            # Arch Linux
-            if pacman -Q ttf-iosevka-term-nerd >/dev/null 2>&1; then
-                info "Font already installed via pacman"
-                return 0
-            fi
-            info "Trying to install via pacman..."
-            if sudo pacman -S --noconfirm ttf-iosevka-term-nerd 2>/dev/null; then
-                info "Font installed via pacman"
-                return 0
-            fi
-        fi
-    fi
-    
-    # Fallback to manual installation
-    warn "Package manager installation not available for $font_name, using manual installation"
-    return 1
-}
 
 install_single_font() {
     local font_name="$1"
@@ -190,14 +88,8 @@ install_single_font() {
         Darwin*)
             install_font_macos "$font_name" "$homebrew_cask"
             ;;
-        Linux*)
-            # Try package manager first, then manual installation
-            if ! install_font_linux_package_manager "$font_name" "$check_name"; then
-                install_font_linux "$font_name" "$download_name" "$check_name"
-            fi
-            ;;
         *)
-            error "Unsupported operating system: $(uname -s)"
+            error "This script only supports macOS"
             ;;
     esac
     

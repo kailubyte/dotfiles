@@ -1,10 +1,10 @@
 # Dotfiles
 
-My personal dotfiles configuration using GNU Stow for cross-platform management.
+My personal dotfiles configuration using GNU Stow for macOS.
 
 ## Structure
 
-This dotfiles repository uses a **split structure** to organize configurations by operating system and shared components:
+This dotfiles repository uses a **split structure** to organize configurations:
 
 ```
 .dotfiles/
@@ -15,11 +15,7 @@ This dotfiles repository uses a **split structure** to organize configurations b
 │       ├── zsh/    # macOS zsh configuration
 │       ├── ghostty/# Terminal emulator config
 │       └── aerospace/ # Window manager config
-├── linux/          # Linux-specific configurations
-│   ├── .zshenv     # Linux environment variables
-│   ├── .gitconfig  # Linux-specific Git settings
-│   └── .config/    # Linux-specific XDG configs
-└── common/         # Shared configurations across all platforms
+└── common/         # Shared configurations
     └── .config/    # Shared XDG configs
         ├── git/    # Global Git settings
         ├── nvim/   # Neovim configuration
@@ -29,10 +25,10 @@ This dotfiles repository uses a **split structure** to organize configurations b
 
 ## Features
 
-### Cross-Platform Support
-- **macOS**: Homebrew integration, SSH FIDO2 support, macOS-specific tools
-- **Linux**: Arch Linux optimized, system package managers
-- **Shared**: Common development tools, editor configs, shell utilities
+### macOS Optimized
+- **Homebrew**: Package management and application installation
+- **SSH FIDO2**: Hardware security key support for Git signing
+- **Development Tools**: Modern CLI tools and editor configurations
 
 ### Security
 - **SSH FIDO2**: Hardware security key support for Git signing
@@ -53,11 +49,44 @@ This dotfiles repository uses a **split structure** to organize configurations b
 
 ## Installation
 
-### Prerequisites
+### Automated Install (Recommended)
+
+The easiest way to install these dotfiles is using the automated install script:
+
+```bash
+# Download and run the install script
+curl -fsSL https://raw.githubusercontent.com/kailubyte/dotfiles/main/install/install.sh | bash
+```
+
+**Or clone first, then run:**
+```bash
+git clone https://github.com/kailubyte/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./install/install.sh
+```
+
+**To use a different repository (if you forked this):**
+```bash
+export DOTFILES_REPO="https://github.com/yourusername/dotfiles.git"
+curl -fsSL https://raw.githubusercontent.com/yourusername/dotfiles/main/install/install.sh | bash
+```
+
+The script automatically:
+- Installs dependencies (Homebrew, git, stow, zsh)
+- Clones the repository and initializes submodules
+- Backs up existing configurations
+- Installs packages from macOS package list
+- Deploys configurations using GNU Stow
+- Sets up zsh as the default shell
+
+### Manual Install
+
+If you prefer manual installation:
+
+**Prerequisites:**
 
 Install required tools:
 
-**macOS:**
 ```bash
 # Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -66,17 +95,11 @@ Install required tools:
 brew install git stow
 ```
 
-**Linux (Arch):**
-```bash
-# Install dependencies
-sudo pacman -S git stow
-```
-
-### Quick Install
+**Steps:**
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/dotfiles.git ~/.dotfiles
+   git clone https://github.com/kailubyte/dotfiles.git ~/.dotfiles
    cd ~/.dotfiles
    ```
 
@@ -87,18 +110,13 @@ sudo pacman -S git stow
 
 3. **Install packages:**
    ```bash
-   # macOS
    brew bundle --file=packages/macos.txt
-   
-   # Linux (Arch)
-   sudo pacman -S --needed - < packages/arch.txt
    ```
 
 4. **Deploy configurations:**
    ```bash
-   # Deploy OS-specific configs
-   stow macos    # On macOS
-   stow linux    # On Linux
+   # Deploy macOS configs
+   stow macos
    
    # Deploy shared configs
    stow common
@@ -106,17 +124,10 @@ sudo pacman -S git stow
 
 ## Package Management
 
-### macOS (Homebrew)
 All packages are defined in `packages/macos.txt` using Homebrew Bundle format:
 - CLI tools and development dependencies
 - Applications via Homebrew Cask
 - Fonts and system utilities
-
-### Linux (Arch)
-Packages are listed in `packages/arch.txt`:
-- System packages via pacman
-- Development tools and utilities
-- Window managers and desktop environment tools
 
 ## Configuration Management
 
@@ -151,9 +162,8 @@ To track a new application config:
 
 3. **Place config in appropriate directory:**
    ```bash
-   # OS-specific
+   # macOS-specific
    macos/.config/newapp/
-   linux/.config/newapp/
    
    # Or shared
    common/.config/newapp/
@@ -186,25 +196,22 @@ update                    # Runs update script
 # Update all packages
 ./scripts/update
 
-# Update specific package manager
-brew upgrade              # macOS
-sudo pacman -Syu         # Arch Linux
+# Update Homebrew packages
+brew upgrade
 ```
 
 ## Customization
 
 ### Environment Variables
 - **macOS**: Edit `macos/.zshenv`
-- **Linux**: Edit `linux/.zshenv`
-- **Shared**: Add to appropriate OS-specific file
+- **Shared**: Add to `macos/.zshenv`
 
 ### Aliases
 - **Shared aliases**: `common/.config/zsh/common-aliases.zsh`
-- **OS-specific**: `macos/.config/zsh/aliases.zsh` or `linux/.config/zsh/aliases.zsh`
+- **macOS-specific**: `macos/.config/zsh/aliases.zsh`
 
 ### Applications
-- **macOS apps**: Add to `packages/macos.txt`
-- **Linux apps**: Add to `packages/arch.txt`
+- **Applications**: Add to `packages/macos.txt`
 
 ## Security Considerations
 

@@ -20,6 +20,7 @@
 # macOS files
 .DS_Store
 **/.DS_Store
+*/.DS_Store
 
 # Log files
 *.log
@@ -91,5 +92,11 @@
 !*//.config/zsh/**
 !*/.config/zsh/
 !*/.config/zsh/**
+
+# Re-ignore ZSH runtime files after whitelisting zsh config
+*/.config/zsh/.zcompdump*
+*/.config/zsh/.zsh_history
+*/.config/zsh/.zsh_sessions/
+*/.config/zsh/.zwc
 
 macos/.config/zsh/.zsh_history

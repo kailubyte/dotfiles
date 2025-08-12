@@ -18,6 +18,7 @@ brew "fzf"               # Fuzzy finder
 brew "bat"               # Better cat with syntax highlighting
 brew "lsd"               # Better ls with colors and icons
 brew "fd"                # Better find
+brew "zoxide"            # Smart cd replacement
 brew "tree"              # Directory tree view
 brew "jq"                # JSON processor
 

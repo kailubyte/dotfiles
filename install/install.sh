@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Comprehensive dotfiles installation script (patched version)
-# Supports macOS and Linux with dependency checking and OS detection
+# macOS dotfiles installation script
+# macOS-only with dependency checking
 
 set -e
 
@@ -23,18 +23,15 @@ warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 step() { echo -e "\n${BLUE}[STEP]${NC} $1\n"; }
 
-# Determine OS
+# Check if running on macOS
 check_os() {
     case "$(uname -s)" in
         Darwin*) echo "macos" ;;
-        Linux*) echo "linux" ;;
-        *) error "Unsupported OS: $(uname -s)" ;;
+        *) error "This script only supports macOS" ;;
     esac
 }
 
 command_exists() { command -v "$1" >/dev/null 2>&1; }
-
-is_arch() { [[ -f /etc/os-release ]] && grep -q "^ID=arch$" /etc/os-release 2>/dev/null; }
 
 validate_package_file() {
     local file="$1"
@@ -42,57 +39,6 @@ validate_package_file() {
     grep -v '^#' "$file" | grep -v '^$' | grep -q . || { warn "No installable packages found in $file"; return 1; }
     info "Validated package list: $file"
     return 0
-}
-
-install_git_linux() {
-    if ! command_exists git; then
-        info "Installing Git..."
-        sudo pacman -S --noconfirm git || error "Failed to install Git"
-    fi
-}
-
-install_stow_linux() {
-    if ! command_exists stow; then
-        info "Installing Stow..."
-        sudo pacman -S --noconfirm stow || error "Failed to install Stow"
-    fi
-}
-
-install_zsh_linux() {
-    if ! command_exists zsh; then
-        info "Installing ZSH..."
-        sudo pacman -S --noconfirm zsh || error "Failed to install ZSH"
-    fi
-}
-
-install_arch_packages() {
-    local arch_packages_file="$HOME/.dotfiles/packages/arch.txt"
-    validate_package_file "$arch_packages_file" || return 1
-
-    local official_packages=($(sed -n '/^# OFFICIAL REPOSITORIES/,/^# AUR PACKAGES/p' "$arch_packages_file" | grep -v '^#' | grep -v '^$'))
-    local aur_packages=($(sed -n '/^# AUR PACKAGES/,$p' "$arch_packages_file" | grep -v '^#' | grep -v '^$'))
-
-    if [[ ${#official_packages[@]} -gt 0 ]]; then
-        step "Installing ${#official_packages[@]} official packages"
-        sudo pacman -S --noconfirm --needed "${official_packages[@]}" || error "Pacman install failed"
-    fi
-
-    if [[ ${#aur_packages[@]} -gt 0 ]]; then
-        if ! command_exists paru; then
-            step "Installing paru AUR helper"
-            temp_dir=$(mktemp -d)
-            git clone https://aur.archlinux.org/paru.git "$temp_dir/paru" || error "Failed to clone paru"
-            cd "$temp_dir/paru"
-            makepkg -si --noconfirm || error "Failed to build paru"
-            cd
-            rm -rf "$temp_dir"
-        fi
-
-        if command_exists paru; then
-            step "Installing ${#aur_packages[@]} AUR packages"
-            paru -S --noconfirm --needed --noprogressbar "${aur_packages[@]}" || error "AUR install failed"
-        fi
-    fi
 }
 
 install_homebrew() {
@@ -109,40 +55,43 @@ install_homebrew() {
     fi
 }
 
-install_git_macos() {
+install_git() {
     if ! command_exists git; then
         info "Installing Git via Homebrew..."
         brew install git || error "Failed to install Git"
     fi
 }
 
-install_stow_macos() {
+install_stow() {
     if ! command_exists stow; then
         info "Installing Stow via Homebrew..."
         brew install stow || error "Failed to install Stow"
     fi
 }
 
-install_zsh_macos() {
+install_zsh() {
     if ! command_exists zsh; then
         info "Installing ZSH via Homebrew..."
         brew install zsh || error "Failed to install ZSH"
     fi
 }
 
-install_macos_packages() {
-    local macos_packages_file="$HOME/.dotfiles/packages/macos.txt"
-    validate_package_file "$macos_packages_file" || return 1
+install_packages() {
+    local packages_file="$HOME/.dotfiles/packages/macos.txt"
+    validate_package_file "$packages_file" || return 1
 
     step "Installing packages from Homebrew Brewfile"
     cd "$HOME/.dotfiles"
-    brew bundle --file="$macos_packages_file" || error "Homebrew bundle install failed"
+    brew bundle --file="$packages_file" || error "Homebrew bundle install failed"
 }
 
 clone_dotfiles() {
     local dir="$HOME/.dotfiles"
     if [[ ! -d "$dir" ]]; then
-        git clone https://github.com/kailubyte/dotfiles.git "$dir" || error "Clone failed"
+        # Try to detect repository URL from environment or use default
+        local repo_url="${DOTFILES_REPO:-https://github.com/kailubyte/dotfiles.git}"
+        info "Cloning dotfiles from: $repo_url"
+        git clone "$repo_url" "$dir" || error "Clone failed"
         cd "$dir"
         git submodule update --init --recursive || error "Submodule init failed"
     else
@@ -153,7 +102,6 @@ clone_dotfiles() {
 
 backup_and_stow() {
     local backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
-    local os_type=$(check_os)
     
     info "Backing up and stowing dotfiles..."
     cd "$HOME/.dotfiles"
@@ -181,9 +129,9 @@ backup_and_stow() {
         fi
     done
     
-    # Stow OS-specific dotfiles first
-    info "Stowing $os_type-specific dotfiles..."
-    stow -v "$os_type" || error "Failed to stow $os_type dotfiles"
+    # Stow macOS dotfiles first
+    info "Stowing macOS dotfiles..."
+    stow -v macos || error "Failed to stow macOS dotfiles"
     
     # Then stow common dotfiles  
     info "Stowing common dotfiles..."
@@ -235,20 +183,14 @@ post_install_message() {
 }
 
 main() {
-    step "Detecting OS"
-    os_type=$(check_os)
+    step "Checking macOS compatibility"
+    check_os
 
     step "Installing base dependencies"
-    if [[ "$os_type" == "macos" ]]; then
-        install_homebrew
-        install_git_macos
-        install_stow_macos
-        install_zsh_macos
-    else
-        install_git_linux
-        install_stow_linux
-        install_zsh_linux
-    fi
+    install_homebrew
+    install_git
+    install_stow
+    install_zsh
 
     step "Cloning dotfiles"
     clone_dotfiles
@@ -256,12 +198,8 @@ main() {
     step "Backing up conflicting files and stowing dotfiles"
     backup_and_stow
 
-    step "Installing packages for $os_type"
-    if [[ "$os_type" == "macos" ]]; then
-        install_macos_packages
-    elif is_arch; then
-        install_arch_packages
-    fi
+    step "Installing packages"
+    install_packages
 
     setup_zsh
     post_install_message

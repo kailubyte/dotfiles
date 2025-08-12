@@ -36,11 +36,8 @@ check_os() {
         Darwin*)
             echo "macos"
             ;;
-        Linux*)
-            echo "linux"
-            ;;
         *)
-            error "Unsupported operating system: $(uname -s)"
+            error "This script only supports macOS"
             exit 1
             ;;
     esac
@@ -88,52 +85,6 @@ check_system_updates_macos() {
     fi
 }
 
-check_system_updates_linux() {
-    step "Checking for Linux system updates..."
-    
-    if command -v apt >/dev/null 2>&1; then
-        # Update package list first
-        sudo apt update >/dev/null 2>&1
-        local upgradable
-        upgradable=$(apt list --upgradable 2>/dev/null | grep -v "WARNING" | wc -l)
-        if [[ $upgradable -gt 1 ]]; then  # -gt 1 because header line counts
-            warn "$((upgradable - 1)) packages can be upgraded"
-            warn "Run 'sudo apt upgrade' to install updates"
-        else
-            info "All packages are up to date"
-        fi
-        
-        # Check for security updates
-        local security_updates
-        security_updates=$(apt list --upgradable 2>/dev/null | grep -c "security" || true)
-        if [[ $security_updates -gt 0 ]]; then
-            warn "$security_updates security updates available"
-        fi
-        
-    elif command -v dnf >/dev/null 2>&1; then
-        local updates
-        updates=$(dnf check-update --quiet 2>/dev/null | wc -l || true)
-        if [[ $updates -gt 0 ]]; then
-            warn "$updates packages can be upgraded"
-            warn "Run 'sudo dnf update' to install updates"
-        else
-            info "All packages are up to date"
-        fi
-        
-    elif command -v pacman >/dev/null 2>&1; then
-        local updates
-        updates=$(checkupdates 2>/dev/null | wc -l || true)
-        if [[ $updates -gt 0 ]]; then
-            warn "$updates packages can be upgraded"
-            warn "Run 'sudo pacman -Syu' to install updates"
-        else
-            info "All packages are up to date"
-        fi
-        
-    else
-        warn "Unable to check for system updates (no supported package manager)"
-    fi
-}
 
 update_dotfiles_repo() {
     step "Updating dotfiles repository..."
@@ -224,22 +175,13 @@ backup_and_restow() {
         info "No conflicting files found"
     fi
     
-    # Re-stow to update any new or changed files using new architecture
+    # Re-stow to update any new or changed files
     info "Re-stowing dotfiles..."
-    local os_type
-    os_type=$(check_os)
     
-    if [[ "$os_type" == "macos" ]]; then
-        stow -R -v macos || {
-            error "Failed to re-stow macos dotfiles"
-            exit 1
-        }
-    else
-        stow -R -v linux || {
-            error "Failed to re-stow linux dotfiles"
-            exit 1
-        }
-    fi
+    stow -R -v macos || {
+        error "Failed to re-stow macos dotfiles"
+        exit 1
+    }
     
     stow -R -v common || {
         error "Failed to re-stow common dotfiles"
@@ -285,32 +227,6 @@ update_packages_macos() {
     fi
 }
 
-update_packages_linux() {
-    step "Updating Linux packages..."
-    
-    if command -v apt >/dev/null 2>&1; then
-        info "Updating packages via apt..."
-        sudo apt update && sudo apt upgrade -y || warn "apt update/upgrade failed"
-        sudo apt autoremove -y || warn "apt autoremove failed"
-        
-    elif command -v dnf >/dev/null 2>&1; then
-        info "Updating packages via dnf..."
-        sudo dnf update -y || warn "dnf update failed"
-        sudo dnf autoremove -y || warn "dnf autoremove failed"
-        
-    elif command -v pacman >/dev/null 2>&1; then
-        info "Updating packages via pacman..."
-        sudo pacman -Syu --noconfirm || warn "pacman update failed"
-        sudo pacman -Rns $(pacman -Qtdq) --noconfirm 2>/dev/null || true  # Remove orphans
-        
-    elif command -v zypper >/dev/null 2>&1; then
-        info "Updating packages via zypper..."
-        sudo zypper update -y || warn "zypper update failed"
-        
-    else
-        warn "No supported package manager found for updates"
-    fi
-}
 
 reload_shell() {
     step "Reloading shell configuration..."
@@ -330,20 +246,12 @@ reload_shell() {
 }
 
 main() {
-    local os_type
-    os_type=$(check_os)
+    check_os
     
-    info "Starting dotfiles update for $os_type..."
+    info "Starting dotfiles update for macOS..."
     
     # Check for system updates first
-    case "$os_type" in
-        macos)
-            check_system_updates_macos
-            ;;
-        linux)
-            check_system_updates_linux
-            ;;
-    esac
+    check_system_updates_macos
     
     echo ""
     
@@ -353,15 +261,8 @@ main() {
     # Re-link dotfiles
     backup_and_restow
     
-    # Update packages based on OS
-    case "$os_type" in
-        macos)
-            update_packages_macos
-            ;;
-        linux)
-            update_packages_linux
-            ;;
-    esac
+    # Update packages
+    update_packages_macos
     
     # Reload shell configuration
     reload_shell
