@@ -112,4 +112,4 @@ if _exists ncdu; then
 fi
 
 # Visual Studio Code
-alias vsc='code'     # Shorter alias for Visual Studio Code
+alias vsc='code .'   # Shorter alias for Visual Studio Code (open current dir)
