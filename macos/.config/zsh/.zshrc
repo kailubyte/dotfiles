@@ -65,8 +65,9 @@ safe_source "$ZDOTDIR/completion.zsh"
 # Open command
 safe_source "$DOTFILES/common/.config/zsh/plugins/open_command.zsh"
 
-# Prompt
-safe_source "$DOTFILES/common/.config/zsh/prompt/prompt_setup"
+# Prompt - Using Starship instead of custom prompt
+# safe_source "$DOTFILES/common/.config/zsh/prompt/prompt_setup"
+eval "$(starship init zsh)"
 
 # bd
 safe_source "$DOTFILES/common/.config/zsh/plugins/bd/bd.zsh"
@@ -104,3 +105,8 @@ safe_source "$DOTFILES/common/.config/zsh/plugins/zsh-you-should-use/you-should-
 # Syntax highlighting - Should be at the end of the file
 safe_source "$DOTFILES/common/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/readerr/.lmstudio/bin"
+# End of LM Studio CLI section
+
